@@ -2,5 +2,5 @@
 // Plain function with no outside references: app.js also inlines it into the page.
 export function countLabel(n) {
   if (n === 0) return 'No notes yet';
-  return n === 1 ? '1 note' : n + ' notes';
+  return n === 1 ? '1 note' : n.toLocaleString('en-US') + ' notes';
 }
