@@ -76,6 +76,13 @@ async function readJson(req) {
 
 export async function handle(req, res) {
   const url = new URL(req.url, 'http://localhost');
+  if (url.pathname === '/health') {
+    if (req.method !== 'GET') {
+      res.setHeader('allow', 'GET');
+      return send(res, 405, { error: 'Method not allowed.' });
+    }
+    return send(res, 200, { status: 'ok' });
+  }
   if (req.method === 'GET' && url.pathname === '/') return send(res, 200, page(), 'text/html; charset=utf-8');
   if (req.method === 'GET' && url.pathname === '/api/notes') return send(res, 200, notes);
   if (req.method === 'POST' && url.pathname === '/api/notes') {

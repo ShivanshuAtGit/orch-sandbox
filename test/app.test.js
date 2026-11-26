@@ -27,6 +27,19 @@ test('an empty note is refused with a plain message', async () => {
   assert.deepEqual(await res.json(), { error: 'Write something first.' });
 });
 
+test('GET /health returns 200 and {status: ok} as JSON, no auth needed', async () => {
+  const res = await fetch(base + '/health');
+  assert.equal(res.status, 200);
+  assert.match(res.headers.get('content-type'), /^application\/json/);
+  assert.deepEqual(await res.json(), { status: 'ok' });
+});
+
+test('non-GET on /health is 405', async () => {
+  const res = await fetch(base + '/health', { method: 'POST' });
+  assert.equal(res.status, 405);
+  assert.equal(res.headers.get('allow'), 'GET');
+});
+
 test('unknown paths are 404', async () => {
   assert.equal((await fetch(base + '/nope')).status, 404);
 });
