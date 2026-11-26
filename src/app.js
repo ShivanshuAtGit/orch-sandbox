@@ -1,6 +1,8 @@
 // A small notes app: one page, an in-memory list, and a JSON API.
 // Kept tiny on purpose: orch's build flow and quality gates are tested on it.
 
+import { countLabel } from './count.js';
+
 const notes = [];
 
 const page = () => `<!doctype html>
@@ -14,12 +16,13 @@ const page = () => `<!doctype html>
     form { display: flex; gap: .5rem; }
     input { flex: 1; padding: .5rem; }
     li { padding: .25rem 0; }
-    .empty { color: #6b7380; }
+    #count { color: #6b7380; font-size: .875rem; margin: 0 0 1rem; white-space: nowrap; }
     .error { color: #b42318; }
   </style>
 </head>
 <body>
   <h1>Notes</h1>
+  <p id="count"></p>
   <form id="add">
     <input id="text" name="text" maxlength="200" placeholder="Write a note" aria-label="Note text">
     <button type="submit">Add</button>
@@ -29,11 +32,20 @@ const page = () => `<!doctype html>
   <script>
     const list = document.getElementById('list');
     const message = document.getElementById('message');
+    const count = document.getElementById('count');
+    ${countLabel.toString()}
     async function load() {
-      const res = await fetch('/api/notes');
-      const items = await res.json();
+      let items;
+      try {
+        const res = await fetch('/api/notes');
+        if (!res.ok) throw new Error('Could not load notes.');
+        items = await res.json();
+      } catch {
+        count.textContent = '';
+        return;
+      }
+      count.textContent = countLabel(items.length);
       list.innerHTML = '';
-      if (!items.length) list.innerHTML = '<li class="empty">No notes yet.</li>';
       for (const n of items) {
         const li = document.createElement('li');
         li.textContent = n.text;
