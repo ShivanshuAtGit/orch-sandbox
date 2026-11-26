@@ -76,3 +76,8 @@ test('a note of spaces is refused and the list stays empty', async () => {
   assert.deepEqual(await res.json(), { error: 'Write something first.' });
   assert.deepEqual(await (await fetch(base + '/api/notes')).json(), []);
 });
+
+test('large counts use a thousands separator', () => {
+  assert.equal(countLabel(1000), '1,000 notes');
+  assert.equal(countLabel(12345), '12,345 notes');
+});
